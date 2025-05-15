@@ -1,16 +1,9 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
-
 name: Gradle Package
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -18,14 +11,13 @@ jobs:
     permissions:
       contents: read
       packages: write
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-            python-version: '3.11'
+          python-version: '3.11'
       - name: Install Python dependencies
         run: pip install PyJWT requests cryptography
 
@@ -44,9 +36,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Give gradlew execute permission
+      - name: Grant execute permission to Gradle
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
@@ -60,4 +52,3 @@ jobs:
         env:
           PUBLISH_USERNAME: ${{ github.actor }}
           PUBLISH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
