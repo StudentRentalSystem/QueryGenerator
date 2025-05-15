@@ -16,14 +16,15 @@ java {
 }
 
 repositories {
-    mavenCentral()
     maven {
-        url = uri("https://maven.pkg.github.com/StudentRentalSystem/LLMDataParser")
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/StudentRentalSystem/llmdataparser")
         credentials {
-            username = System.getenv("USERNAME")
-            password = System.getenv("TOKEN")
+            username = System.getenv("READ_PACKAGE_USERNAME")
+            password = System.getenv("READ_PACKAGE_TOKEN")
         }
     }
+    mavenCentral()
 }
 
 dependencies {
@@ -53,8 +54,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/StudentRentalSystem/QueryGenerator")
             credentials {
-                username = System.getenv("USERNAME")
-                password = System.getenv("TOKEN")
+                username = System.getenv("PUBLISH_USERNAME")
+                password = System.getenv("PUBLISH_TOKEN")
             }
         }
     }
