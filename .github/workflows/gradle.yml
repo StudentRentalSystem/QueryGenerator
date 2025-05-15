@@ -27,11 +27,11 @@ jobs:
         with:
             python-version: '3.11'
       - name: Install Python dependencies
-        run: pip install PyJWT requests
+        run: pip install PyJWT requests cryptography
 
       - name: Get GitHub App Token
         run: |
-          echo "READ_PACKAGE_TOKEN=$(python generate_token.py)" >> $GITHUB_ENV
+          echo "READ_PACKAGE_TOKEN=$(python scripts/generate_token.py)" >> $GITHUB_ENV
         env:
           GH_APP_ID: ${{secrets.GH_APP_ID}}
           GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
