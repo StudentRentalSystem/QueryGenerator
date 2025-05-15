@@ -34,6 +34,12 @@ jobs:
         run: |
           echo "READ_PACKAGE_TOKEN=$(python scripts/generate_token.py)" >> $GITHUB_ENV
 
+      - name: Inject Gradle credentials  # ⬅️ 這個新增在這裡
+        run: |
+          mkdir -p ~/.gradle
+          echo "gpr.user=x-access-token" >> ~/.gradle/gradle.properties
+          echo "gpr.key=${{ env.READ_PACKAGE_TOKEN }}" >> ~/.gradle/gradle.properties
+
       - name: Check token visibility
         run: |
           echo "READ_PACKAGE_TOKEN=${{ env.READ_PACKAGE_TOKEN }}" | head -c 50

@@ -21,9 +21,10 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/StudentRentalSystem/LLMDataParser")
         credentials {
-            username = "x-access-token"
-            password = System.getenv("READ_PACKAGE_TOKEN")
+            username = findProperty("gpr.user") as String
+            password = findProperty("gpr.key") as String
         }
+
     }
     mavenCentral()
 }
