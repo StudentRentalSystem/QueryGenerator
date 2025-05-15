@@ -6,10 +6,11 @@ import sys
 
 APP_ID = os.getenv("GH_APP_ID")
 TARGET_ACCOUNT = os.getenv("TARGET_ACCOUNT")
-PRIVATE_KEY = os.getenv("GH_APP_PRIVATE_KEY")
+PRIVATE_KEY_STR = os.getenv("GH_APP_PRIVATE_KEY")
 
-if not APP_ID or not TARGET_ACCOUNT:
-    print("❌ 請設定 GH_APP_ID 與 TARGET_ACCOUNT")
+
+if not APP_ID or not TARGET_ACCOUNT or not PRIVATE_KEY_STR:
+    print("❌ 請設定 GH_APP_ID、TARGET_ACCOUNT 與 GH_APP_PRIVATE_KEY")
     sys.exit(1)
 
 def generate_jwt(app_id: str, private_key: str):
@@ -29,7 +30,6 @@ def get_installation_id(jwt_token: str, target_account: str):
     }
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
-    print(resp.json())
     for inst in resp.json():
         if inst["account"]["login"].lower() == target_account.lower():
             return inst["id"]
@@ -46,7 +46,7 @@ def get_access_token(jwt_token: str, installation_id: int):
     return resp.json()["token"]
 
 def main():
-    jwt_token = generate_jwt(APP_ID, PRIVATE_KEY)
+    jwt_token = generate_jwt(APP_ID, PRIVATE_KEY_STR)
     installation_id = get_installation_id(jwt_token, TARGET_ACCOUNT)
     token = get_access_token(jwt_token, installation_id)
     print(token)
