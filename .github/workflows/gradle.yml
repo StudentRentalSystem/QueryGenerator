@@ -17,7 +17,6 @@ jobs:
       GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
       TARGET_ACCOUNT: "StudentRentalSystem"
       READ_PACKAGE_USERNAME: x-access-token
-      READ_PACKAGE_TOKEN: ${{ env.READ_PACKAGE_TOKEN }}
       PUBLISH_USERNAME: ${{ github.actor }}
       PUBLISH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,6 +48,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          READ_PACKAGE_TOKEN: ${{ env.READ_PACKAGE_TOKEN }}
 
       - name: Publish to GitHub Packages
         run: ./gradlew publish
