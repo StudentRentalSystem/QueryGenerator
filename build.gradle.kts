@@ -19,7 +19,7 @@ java {
 repositories {
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/StudentRentalSystem/llmdataparser")
+        url = uri("https://maven.pkg.github.com/StudentRentalSystem/LLMDataParser")
         credentials {
             username = System.getenv("READ_PACKAGE_USERNAME")
             password = System.getenv("READ_PACKAGE_TOKEN")
