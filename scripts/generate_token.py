@@ -8,7 +8,6 @@ APP_ID = os.getenv("GH_APP_ID")
 TARGET_ACCOUNT = os.getenv("TARGET_ACCOUNT")
 PRIVATE_KEY_STR = os.getenv("GH_APP_PRIVATE_KEY")
 
-
 if not APP_ID or not TARGET_ACCOUNT or not PRIVATE_KEY_STR:
     print("❌ 請設定 GH_APP_ID、TARGET_ACCOUNT 與 GH_APP_PRIVATE_KEY")
     sys.exit(1)
@@ -17,7 +16,7 @@ def generate_jwt(app_id: str, private_key: str):
     now = int(time.time())
     payload = {
         "iat": now - 60,
-        "exp": now + (10 * 59),
+        "exp": now + (10 * 60),
         "iss": app_id
     }
     return jwt.encode(payload, private_key, algorithm="RS256")
