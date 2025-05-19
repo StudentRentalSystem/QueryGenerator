@@ -11,7 +11,6 @@ import java.util.Scanner;
 import io.github.studentrentalsystem.LLMClient;
 
 import static io.github.querygenerator.Settings.*;
-import static io.github.studentrentalsystem.Settings.llama3_8b;
 import static io.github.studentrentalsystem.Utils.getStringJSON;
 
 
@@ -48,21 +47,22 @@ public class MiniRagApp {
 
     public String formatQuery(String query) {
         String formattedQueryPrompt = queryPromptTemplate.replace("{query}", query);
-        return LLMClient.callLocalModel(formattedQueryPrompt, llama3_8b, "http://localhost:11434/api/generate");
+        return LLMClient.callLocalModel(formattedQueryPrompt, LLMClient.ModelType.LLAMA3_8B, "http://localhost:11434/api/generate");
     }
 
 
     public String formatMongoDBQuery(String query) {
         String formattedMongoDBQueryPrompt = mongoDBQueryPromptTemplate.replace("{query}", query);
 
-        return LLMClient.callLocalModel(formattedMongoDBQueryPrompt, llama3_8b, "http://localhost:11434/api/generate");
+        return LLMClient.callLocalModel(formattedMongoDBQueryPrompt, LLMClient.ModelType.LLAMA3_8B, "http://localhost:11434/api/generate");
     }
 
 
     public String getMongoDBSearchCmd(String query) {
         try {
             query = formatMongoDBQuery(query);
-
+            query = query.replace("可", "是否可");
+            query = query.replace("有", "是否有");
         } catch (JSONException e) {
             e.printStackTrace();
         }
