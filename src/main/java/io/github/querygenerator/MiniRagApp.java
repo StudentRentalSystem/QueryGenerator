@@ -1,6 +1,7 @@
 package io.github.querygenerator;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.FileNotFoundException;
@@ -86,7 +87,7 @@ public class MiniRagApp {
 
     public JSONObject getFixedMongoQueryCmd(JSONObject query) throws JSONException {
         if (query == null) return null;
-        return MongoSearchStatementFixer.fixRentalQuery(query);
+        return MongoSearchStatementFixer.fixQuery(query);
     }
 
 
@@ -94,9 +95,21 @@ public class MiniRagApp {
         MiniRagApp miniRag = new MiniRagApp();
 
         String response = "";
-        JSONObject jsonResponse;
+        JSONObject jsonResponse = null;
 
         boolean useMongoDB = true;
+
+        JSONObject test = miniRag.getFixedMongoQueryCmd(new JSONObject("{\"rental.minRental\":{\"$gte\":5000},\"rental.maxRental\":{\"$lte\":5000}}"));
+        System.out.println(test);
+
+        String testAddress = "{\"$and\":[\n" +
+                "  {\"地址\":{\"$regex\":\"台南市東區勝利路\",\"$options\":\"i\"}},\n" +
+                "  {\"租金.minRental\":{\"$gte\":5000}},\n" +
+                "  {\"租金.maxRental\":{\"$lte\":10000}},\n" +
+                "  {\"是否有電梯\":1}\n" +
+                "]}";
+
+        System.out.println(MongoSearchStatementFixer.fixAddressQuery(new JSONObject(testAddress)));
 
         try {
             Scanner scanner = new Scanner(System.in);
@@ -120,7 +133,7 @@ public class MiniRagApp {
                 if (useMongoDB) {
                     // Get mongoDB result
                     jsonResponse = miniRag.getMongoDBSearchCmdJSON(userQuery);
-
+                    System.out.println(jsonResponse);
                     if ((jsonResponse = miniRag.getFixedMongoQueryCmd(jsonResponse)) != null) System.out.println(jsonResponse);
                 } else {
                     BlockingQueue<LLMClient.StreamData> queue = new LinkedBlockingQueue<>();
@@ -162,7 +175,9 @@ public class MiniRagApp {
 
             System.out.println("👋 再見！");
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             if (response != null) System.out.println(response);
+            if (jsonResponse != null) System.out.println(jsonResponse);
             e.printStackTrace();
         }
     }
