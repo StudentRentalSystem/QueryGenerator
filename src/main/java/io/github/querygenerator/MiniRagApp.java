@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import io.github.studentrentalsystem.LLMClient;
+import io.github.studentrentalsystem.LLMConfig;
 
 import static io.github.querygenerator.Settings.*;
 import static io.github.studentrentalsystem.Utils.getStringJSON;
@@ -21,7 +22,8 @@ import static io.github.studentrentalsystem.Utils.getStringJSON;
 public class MiniRagApp {
     private static String queryPromptTemplate;
     private static String mongoDBQueryPromptTemplate;
-    private final boolean stream;
+    private final LLMConfig llmConfig;
+    private final LLMClient llmClient;
 
 
     private void parseQueryPrompt() throws IOException {
@@ -40,8 +42,9 @@ public class MiniRagApp {
         mongoDBQueryPromptTemplate = new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    public MiniRagApp(boolean stream) {
-        this.stream = stream;
+    public MiniRagApp(LLMConfig llmConfig) {
+        this.llmConfig = llmConfig;
+        this.llmClient = new LLMClient(llmConfig);
         try {
             parseQueryPrompt();
             parseMongoDBQueryPrompt();
@@ -51,14 +54,15 @@ public class MiniRagApp {
     }
 
     public MiniRagApp() {
-        this(false);
+        this(new LLMConfig());
     }
 
     public String formatQuery(String query) {
         String formattedQueryPrompt = queryPromptTemplate.replace("{query}", query);
-        String response = LLMClient.callLocalModel(formattedQueryPrompt, LLMClient.ModelType.LLAMA3_8B, "http://localhost:11434/api/generate");
+        String response = llmClient.callLocalModel(formattedQueryPrompt);
         response = response.replace("可", "是否可");
         response = response.replace("有", "是否有");
+        response = llmClient.getDetailMessage(response);
         return response;
     }
 
@@ -66,7 +70,7 @@ public class MiniRagApp {
     public String formatMongoDBQuery(String query) {
         String formattedMongoDBQueryPrompt = mongoDBQueryPromptTemplate.replace("{query}", query);
 
-        return LLMClient.callLocalModel(formattedMongoDBQueryPrompt, LLMClient.ModelType.LLAMA3_8B, "http://localhost:11434/api/generate");
+        return llmClient.callLocalModel(formattedMongoDBQueryPrompt);
     }
 
 
@@ -79,9 +83,7 @@ public class MiniRagApp {
 
     public JSONObject getMongoDBSearchCmdJSON(String query) throws JSONException {
         String response = getMongoDBSearchCmd(query);
-
-        JSONObject responseBody = new JSONObject(response);
-        response = responseBody.getString("response");
+        response = llmClient.getDetailMessage(response);
         return getStringJSON(response);
     }
 
@@ -92,7 +94,8 @@ public class MiniRagApp {
 
 
     public static void main(String[] args) {
-        MiniRagApp miniRag = new MiniRagApp();
+        LLMConfig llmConfig = new LLMConfig(true, "http://localhost", 11434, LLMConfig.ModelType.LLAMA3_8B, false, null);
+        MiniRagApp miniRag = new MiniRagApp(llmConfig);
 
         String response = "";
         JSONObject jsonResponse = null;
@@ -138,9 +141,11 @@ public class MiniRagApp {
                 } else {
                     BlockingQueue<LLMClient.StreamData> queue = new LinkedBlockingQueue<>();
                     String finalUserQuery = userQuery;
+                    LLMClient llmClient = new LLMClient(new LLMConfig(true, "http://localhost", 11434, LLMConfig.ModelType.LLAMA3_8B, true, queue));
 
                     Thread worker = new Thread(() -> {
-                        LLMClient.callLocalModel(finalUserQuery, LLMClient.ModelType.LLAMA3_8B, "http://localhost:11434/api/generate", true, queue);
+//                        LLMClient
+                        llmClient.callLocalModel(finalUserQuery);
                     });
 
                     // Main thread to listen token
