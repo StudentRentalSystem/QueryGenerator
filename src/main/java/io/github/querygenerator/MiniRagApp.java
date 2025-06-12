@@ -11,10 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import io.github.studentrentalsystem.LLMClient;
 import io.github.studentrentalsystem.LLMConfig;
-
 import static io.github.querygenerator.Settings.*;
 import static io.github.studentrentalsystem.Utils.getStringJSON;
 
@@ -84,6 +82,7 @@ public class MiniRagApp {
     public JSONObject getMongoDBSearchCmdJSON(String query) throws JSONException {
         String response = getMongoDBSearchCmd(query);
         response = llmClient.getDetailMessage(response);
+        response = response.replaceAll("(?s)<think>.*?</think>", "").trim();
         return getStringJSON(response);
     }
 
@@ -93,8 +92,15 @@ public class MiniRagApp {
     }
 
 
-    public static void main(String[] args) {
-        LLMConfig llmConfig = new LLMConfig(true, "http://localhost", 11434, LLMConfig.ModelType.LLAMA3_8B, false, null);
+    public static void main(String[] args) throws IllegalArgumentException {
+        LLMConfig llmConfig = new LLMConfig(
+                LLMConfig.LLMMode.CHAT,
+                "http://140.116.110.134",
+                11434,
+                "deepseek-r1:14b",
+                false,
+                null
+        );
         MiniRagApp miniRag = new MiniRagApp(llmConfig);
 
         String response = "";
@@ -141,7 +147,7 @@ public class MiniRagApp {
                 } else {
                     BlockingQueue<LLMClient.StreamData> queue = new LinkedBlockingQueue<>();
                     String finalUserQuery = userQuery;
-                    LLMClient llmClient = new LLMClient(new LLMConfig(true, "http://localhost", 11434, LLMConfig.ModelType.LLAMA3_8B, true, queue));
+                    LLMClient llmClient = new LLMClient(new LLMConfig(LLMConfig.LLMMode.CHAT, "http://localhost", 11434, "llama3:8b", true, queue));
 
                     Thread worker = new Thread(() -> {
 //                        LLMClient
