@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import io.github.studentrentalsystem.LLMClient;
 import io.github.studentrentalsystem.LLMConfig;
 import static io.github.querygenerator.Settings.*;
-import static io.github.studentrentalsystem.Utils.getStringJSON;
+import static io.github.querygenerator.Utils.getStringJSON;
 
 
 public class MiniRagApp {
@@ -148,7 +148,6 @@ public class MiniRagApp {
                     BlockingQueue<LLMClient.StreamData> queue = new LinkedBlockingQueue<>();
                     String finalUserQuery = userQuery;
                     LLMClient llmClient = new LLMClient(new LLMConfig(LLMConfig.LLMMode.CHAT, "http://localhost", 11434, "llama3:8b", true, queue));
-
                     Thread worker = new Thread(() -> {
 //                        LLMClient
                         llmClient.callLocalModel(finalUserQuery);
