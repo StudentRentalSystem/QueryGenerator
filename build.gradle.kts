@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.studentrentalsystem"
-version = "1.0.2"
+version = "1.0.3"
 
 
 java {
@@ -46,7 +46,7 @@ publishing {
             from(components["java"])
             groupId = "io.github.studentrentalsystem"
             artifactId = "querygenerator"
-            version = "1.0.2"
+            version = "1.0.3"
         }
     }
 
